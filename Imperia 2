@@ -1,0 +1,241 @@
+//=UserScript==
+// @name ALARME + ALGUMAS PARADAS
+// @namespace http://www.offboard.info
+// @version 0.3
+// @description Script de automatização I.O.
+// @match https://*.imperiaonline.org/imperia/game_v6/game/village.php
+// @match https://*.imperiaonline.org/imperia/game_v6/game/village.php?lang=br // @copyright 2016+,JONH ZILLA
+// @require http://code.jquery.com/jquery-latest.js
+// @require http://code.jquery.com/ui/1.11.0/jquery-ui.js
+// @require http://www.offboard.wc.lt/blog/io/jquery.btechco.excelexport.js
+// @require http://www.offboard.wc.lt/blog/io/jquery.base64.js
+// @grant GM_registerMenuCommand
+// @grant GM_setValue
+// @grant GM_getValue
+// ==/UserScript==
+
+
+var $j = jQuery.noConflict(); var tempo_reload = 20000; $j(function() {
+var e = 0;
+var f = GM_getValue(playerName + "ScriptStart", "false");
+var g = GM_getValue(playerName + "ScriptAtaque", "true");
+var h = GM_getValue(playerName + "ScriptAtaqueAli", "true");
+var i = GM_getValue(playerName + "ScriptSpy", "true");
+var j = GM_getValue(playerName + "ScriptMsg", "true");
+var k = GM_getValue(playerName + "ScriptLogin", "true");
+var a = GM_getValue(playerName + "ScriptRefresh", "true");
+var v = GM_getValue(playerName +"ScriptMoverRec", "true");
+var p = GM_getValue(playerName +"ScriptEmpregarPop", "true"); var r10 = GM_getValue(playerName +"ScriptReduzir10min", "true");
+$j('head').append('<style type="text/css">.buttonPlayScript{display: inline-block;margin: 0px;color: #F1ECDC;font-weight: bold;font-family: inherit;text-align: center;text-shadow: 1px 1px #374F53;text-decoration: none;white-space: nowrap;outline: none;cursor: pointer;background: url("http://ihcdn3.ioimg.org/iov6live/gui/buttons.png?v=71") repeat-x;border: 1px solid #5A4436;box-sizing: content-box;box-shadow: 0px 0px 0px 3px rgba(122,90,71,0.2),0px 2px 0px 0px rgba(255,255,255,0.5) inset;min-width: 65px;height: 22px;line-height: 22px;padding: 0px 10px;font-size: 14px;text-transform: none;border-radius: 4px;vertical-align: top;margin-top: 3px;}.buttonPlayScript.Castanho{background-position: 0px -96px;}.buttonPlayScript.Castanho:hover{background-position: 0px -120px;}.buttonPlayScript.Vermelho{background-position: 0px -288px;}.buttonPlayScript.Vermelho:hover{background-position: 0px -312px;}.ui-icons-script{display: inline-block !important;width: 27px;height: 28px;line-height: 28px;background-image:
+
+ url("http://ihcdn3.ioimg.org/iov6live/gui/village-v6/ui-footer-small.png?v=716");background-po sition: 0px 0px;}.ui-icons-script:hover{background-image: url("http://ihcdn3.ioimg.org/iov6live/gui/village-v6/ui-footer-small-hover.png?v=716")}</style>' );
+$j('<div style="position:fixed;left:0px;height:30px;width: 140px;z-index:1000;bottom: 45px;border: 1px solid #000604;border-radius: 5px;background-color: rgba(65,53,36,0.8);">'
++ '<audio id="AtaqueAudio" loop>'
++ '<source src="http://www.soundrangers.com/demos/sirens/firetruck_siren.mp3" type="audio/wav">'
++ '<source src="http://www.soundrangers.com/demos/sirens/firetruck_siren.mp3" type="audio/mpeg">'
++ '</audio>'
++ '<audio id="SpyAudio" loop>'
++ '<source src="http://www.soundrangers.com/demos/sirens/firetruck_siren.mp3"
+type="audio/wav">'
++ '<source src="http://www.soundrangers.com/demos/sirens/firetruck_siren.mp3"
+type="audio/mpeg">' + '</audio>'
++ '<audio id="LoginAudio" loop>'
++ '<source src="http://www.soundrangers.com/demos/sirens/ambulance_siren.mp3" type="audio/wav">'
++ '<source src="http://www.soundrangers.com/demos/sirens/ambulance_siren.mp3" type="audio/mpeg">'
++ '</audio>'
++ '<audio id="MessageAudio" loop>' + '<source src="http://www.soundrangers.com/demos/sirens/ambulance_siren.mp3" type="audio/wav">'
++ '<source src="http://www.soundrangers.com/demos/sirens/ambulance_siren.mp3" type="audio/mpeg">'
++ '</audio>'
++ '<div id="OpenScripOpcoes" class="ui-icons-script" style="cursor:pointer;">' + '</div>' + '<div style="display:inline-block;padding-left:5px;">'
++ '</div>'
++ '<button id="play" class="buttonPlayScript Castanho">Iniciar</button>'
++ '<button id="Pause" class="buttonPlayScript Vermelho"
+style="display:none;">Parar</button>' + '<div>').appendTo('body');
+// ====================================================================== ==== JANELA DE OPÇÕES ====================================================================== =========================
+$j('<div id="OpcoesScript" class="window-wrapper active ui-draggable zoom" style="top: 0px; -webkit-transform-origin: 0px 0px; -webkit-transform: matrix(0.8, 0, 0, 0.8, 0, 0);display:none;">'
+
+ + '<div class="window-title"> <a href="#" id="closeScripOpcoes" class="close" onmouseup=" $(this).closest(\'.ui-draggable\').removeClass(\'no-drag\');" onmousedown="$(this).closest(\'.ui-draggable\').addClass(\'no-drag\');">'
++ '</a> <div class="inactive"> <a href="#" id="closeScripOpcoes" class="close" onmouseup=" $(this).closest(\'.ui-draggable\').removeClass(\'no-drag\');" onmousedown="$(this).closest(\'.ui-draggable\').addClass(\'no-drag\');">'
++ '</a> </div> <div class="title"> <div class="arrow left disabled"></div><span class="txt-title">Opções Script</span> <div class="arrow right disabled"></div> </div> </div> <div id="messageboxScript" class="window-content">'
++ '<ul class="window-tabs"> <li class="ui-ib tab-empire active"> <a href="#"> <div style="background-position: -120px -360px;"></div>Opções</a> </li> </ul> <div id="messageboxScriptTab" class="tabs-content clear">'
++ '<span class="window-decor-left"></span><span class="window-decor-right"></span> <div class="window-size window-middle settings-main"> <div class="content settings-empire"> <div style="width:400px;margin: auto;"> '
++ '<div style="height:30px;display:block;"> <div class="checkbox-wrap inline-ie"> <input type="checkbox" id="chkAtaque" class="checkbox ui-pass"> </div>Alerta de Ataque '
++ '<button id="PrevAudioAtaque" style="float: right;" class="buttonPlayScript Castanho">Ouvir</button> <button id="StopAudioAtaque" style="float: right;display:none;" class="buttonPlayScript Vermelho">'
++ 'Stop</button> </div> <div style="height:30px;display:block;"> '
++ '<div class="checkbox-wrap inline-ie"> <input type="checkbox" id="chkRefresh" class="checkbox ui-pass"> </div>Auto Reload da Página</div>'
++ '<div style="height:30px;display:block;">'
++ '<div class="checkbox-wrap inline-ie"><input type="checkbox" id="chkMoverRec" class="checkbox ui-pass"></div>Mover Recursos</div><div style="height:30px;display:block;">'
++ '<div class="checkbox-wrap inline-ie"><input type="checkbox" id="chkEmpregarPop" class="checkbox ui-pass"></div>Empregar População</div><div style="height:30px;display:block;">'
++ '<div class="checkbox-wrap inline-ie"><input type="checkbox" id="chkReduzir10min" class="checkbox ui-pass"></div>Reduzir 10 Minutos </div><div style="height:30px;display:block;">'
++ '<div class="checkbox-wrap inline-ie"> <input type="checkbox" id="chkAtaqueAli" class="checkbox ui-pass"> </div>Alerta de Ataque Aliança '
++ '<button id="PrevAudioAtaqueAli" style="float: right;" class="buttonPlayScript Castanho">Ouvir</button> <button id="StopAudioAtaqueAli" style="float: right;display:none;" class="buttonPlayScript Vermelho">Stop</button> '
++ '</div> <div style="height:30px;display:block;"> <div class="checkbox-wrap inline-ie"> <input type="checkbox" id="chkSpy" class="checkbox ui-pass"> </div>Alerta de Spy <button id="PrevAudioSpy" style="float: right;" class="buttonPlayScript Castanho">'
++ 'Ouvir</button> <button id="StopAudioSpy" style="float: right;display:none;" class="buttonPlayScript Vermelho">Stop</button> </div> <div style="height:30px;display:block;"> '
++ '<div class="checkbox-wrap inline-ie"> '
+
+ + '<input type="checkbox" id="chkMsg" class="checkbox ui-pass"> </div>Alerta de Mensagem Privada <button id="PrevAudioMsg" style="float: right;" class="buttonPlayScript Castanho">Ouvir</button>'
++ '<button id="StopAudioMsg" style="float: right;display:none;" class="buttonPlayScript Vermelho">Stop</button> </div> <div style="height:30px;display:block;"> <div class="checkbox-wrap inline-ie">'
++ '<input type="checkbox" id="chkLogin" class="checkbox ui-pass"> </div>Alerta de Login <button id="PrevAudioLogin" style="float: right;" class="buttonPlayScript Castanho">Ouvir</button> '
++ '<button id="StopAudioLogin" style="float: right;display:none;" class="buttonPlayScript Vermelho">Stop</button> </div> </div> <div id="confirmationSettings" class="centered"> <div class="centered-block" style=""> '
++ '<button class="button blue " type="button" id="btnGuardarScript" value="Guardar">Salvar</button> </div> </div> </div> <div id="scan" class="content settings-empire"> <hr class="divider"> '
++ '<div class="window-footer">Priv8 j4chal - jmota.pc <div class="window-footer-top"></div> <div class="window-footer-content"></div> </div> </div> </div> </div></div>').appendTo('body');
+if
+}
+} if
+}
+} if
+}
+} if
+}
+} if
+}
+(g == "true") {
+$j('#chkAtaque').prop('checked', true); $j('#chkAtaque').parent().addClass("checked");
+else {
+$j('#chkAtaque').prop('checked', false);
+(h == "true") {
+$j('#chkAtaqueAli').prop('checked', true); $j('#chkAtaqueAli').parent().addClass("checked");
+else {
+$j('#chkAtaqueAli').prop('checked', false);
+(i == "true") {
+$j('#chkSpy').prop('checked', true); $j('#chkSpy').parent().addClass("checked");
+else {
+$j('#chkSpy').prop('checked', false);
+(j == "true") {
+$j('#chkMsg').prop('checked', true); $j('#chkMsg').parent().addClass("checked");
+else {
+$j('#chkMsg').prop('checked', false);
+(k == "true") {
+$j('#chkLogin').prop('checked', true); $j('#chkLogin').parent().addClass("checked");
+else {
+
+ $j('#chkLogin').prop('checked', false); }
+if
+} } if
+} } if
+} } if
+}
+}
+$j("#PrevAudioAtaque").click(function() {
+$j("#AtaqueAudio").trigger('play'); $j("#PrevAudioAtaque").css("display", "none"); $j("#StopAudioAtaque").css("display", "block");
+}); $j("#StopAudioAtaque").click(function() {
+$j("#AtaqueAudio").trigger('pause'); $j("#AtaqueAudio").prop("currentTime", 0); $j("#PrevAudioAtaque").css("display", "block"); $j("#StopAudioAtaque").css("display", "none");
+}); $j("#PrevAudioAtaqueAli").click(function() {
+$j("#AtaqueAudio").trigger('play'); $j("#PrevAudioAtaqueAli").css("display", "none"); $j("#StopAudioAtaqueAli").css("display", "block");
+});
+(a == "true") {
+$j('#chkRefresh').prop('checked', true); $j('#chkRefresh').parent().addClass("checked");
+else {
+$j('#chkRefresh').prop('checked', false);
+(v == "true") {
+$j('#chkMoverRec').prop('checked', true); $j('#chkMoverRec').parent().addClass("checked");
+else {
+$j('#chkMoverRec').prop('checked', false);
+(p == "true") {
+$j('#chkEmpregarPop').prop('checked', true); $j('#chkEmpregarPop').parent().addClass("checked");
+else {
+$j('#chkEmpregarPop').prop('checked', false);
+(r10 == "true") { $j('#chkReduzir10min').prop('checked', true); $j('#chkReduzir10min').parent().addClass("checked");
+else {
+$j('#chkReduzir10min').prop('checked', false);
+
+ $j("#StopAudioAtaqueAli").click(function() { $j("#AtaqueAudio").trigger('pause'); $j("#AtaqueAudio").prop("currentTime", 0); $j("#PrevAudioAtaqueAli").css("display", "block"); $j("#StopAudioAtaqueAli").css("display", "none");
+}); $j("#PrevAudioSpy").click(function() {
+$j("#SpyAudio").trigger('play'); $j("#PrevAudioSpy").css("display", "none"); $j("#StopAudioSpy").css("display", "block");
+}); $j("#StopAudioSpy").click(function() {
+$j("#SpyAudio").trigger('pause'); $j("#SpyAudio").prop("currentTime", 0); $j("#PrevAudioSpy").css("display", "block"); $j("#StopAudioSpy").css("display", "none");
+}); $j("#PrevAudioMsg").click(function() {
+$j("#MessageAudio").trigger('play'); $j("#PrevAudioMsg").css("display", "none"); $j("#StopAudioMsg").css("display", "block");
+}); $j("#StopAudioMsg").click(function() {
+$j("#MessageAudio").trigger('pause'); $j("#MessageAudio").prop("currentTime", 0); $j("#PrevAudioMsg").css("display", "block"); $j("#StopAudioMsg").css("display", "none");
+}); $j("#PrevAudioLogin").click(function() {
+$j("#LoginAudio").trigger('play'); $j("#PrevAudioLogin").css("display", "none"); $j("#StopAudioLogin").css("display", "block");
+}); $j("#StopAudioLogin").click(function() {
+$j("#LoginAudio").trigger('pause'); $j("#LoginAudio").prop("currentTime", 0); $j("#PrevAudioLogin").css("display", "block"); $j("#StopAudioLogin").css("display", "none");
+}); $j("#OpcoesScript").draggable({
+cancel: ".no-drag" });
+$j("#OpenScripOpcoes").click(function(a) { a.preventDefault();
+var b = 618;
+
+ var c = $j(document).width(); var d = ((c / 2) - (b / 2)); $j("#OpcoesScript").css({
+"display": "block",
+"left": d });
+$j("#OpcoesScript").addClass("active"); });
+$j("#closeScripOpcoes").click(function(a) { a.preventDefault(); $j("#OpcoesScript").css({
+"display": "none" });
+$j("#OpcoesScript").addClass("active"); });
+$j("#btnGuardarScript").click(function() { try {
+GM_setValue(playerName + "ScriptAtaque", String($j('#chkAtaque').prop('checked')));
+GM_setValue(playerName + "ScriptAtaqueAli", String($j('#chkAtaqueAli').prop('checked')));
+GM_setValue(playerName + "ScriptSpy", String($j('#chkSpy').prop('checked'))); GM_setValue(playerName + "ScriptMsg", String($j('#chkMsg').prop('checked'))); GM_setValue(playerName + "ScriptLogin", String($j('#chkLogin').prop('checked'))); GM_setValue(playerName + "ScriptRefresh",
+String($j('#chkRefresh').prop('checked'))); GM_setValue(playerName+"ScriptMoverRec",
+String($j('#chkMoverRec').prop('checked'))); GM_setValue(playerName+"ScriptEmpregarPop",
+String($j('#chkEmpregarPop').prop('checked'))); GM_setValue(playerName+"ScriptReduzir10min",
+String($j('#chkReduzir10min').prop('checked')));
+// alert("Configurações salvas com sucesso"); } catch (err) {
+alert("Erro ao salvar configurações!"); }
+f = GM_getValue(playerName + "ScriptStart", "false");
+g = GM_getValue(playerName + "ScriptAtaque", "true");
+h = GM_getValue(playerName + "ScriptAtaqueAli", "true"); i = GM_getValue(playerName + "ScriptSpy", "true");
+j = GM_getValue(playerName + "ScriptMsg", "true");
+k = GM_getValue(playerName + "ScriptLogin", "true");
+a = GM_getValue(playerName + "ScriptRefresh", "true");
+
+ v = GM_getValue(playerName+"ScriptMoverRec", "true");
+p = GM_getValue(playerName+"ScriptEmpregarPop", "true"); r10 = GM_getValue(playerName+"ScriptReduzir10min", "true");
+// fechar janela depois q salvar
+$j("#OpcoesScript").css("display", "none"); });
+$j("#chatAudio").trigger('load');
+$j("#play").click(function() {
+$j("#play").css("display", "none"); $j("#Pause").css("display", "inline-block"); GM_setValue(playerName + "ScriptStart", "true"); f = "true";
+e = setInterval(function() { console.log("Interval"); // refresh
+if (a == "true") {
+location.href = $j("#item-capital").attr("href"); }
+if (g == "true") {
+if ($j(".attack-me").length > 0) {
+$j("#AtaqueAudio").trigger('play'); }
+}
+if (h == "true") {
+if ($j(".attack-alliance").length > 0) { $j("#AtaqueAudio").trigger('play');
+} }
+if (i == "true") {
+if ($j(".checkin-a-mail .letter-2").length > 0) {
+$j("#SpyAudio").trigger('play'); }
+}
+if (j == "true") {
+if ($j(".checkin-a-mail .letter-0").length > 0) { $j("#MessageAudio").trigger('play');
+} }
+if (v == "true") { MoverRecursos();
+}
+
+ if (p == "true") { EmpregarPopulacao();
+}
+if (r10 == "true") { Reduzir10minutos();
+}
+}, tempo_reload); });
+function MoverRecursos() {
+console.log('Mover Recursos ----> Ok'); xajax_doTransportNowByResource(container.open({saveName:'missions',title:'As
+minhas missões'}),{'tab': 2, 'type': 'all'}); };
+function EmpregarPopulacao() {
+console.log('Empregar População ----> Ok'); xajax_doHireWorkersAllProvinces('fast_hire', {'workers': {'optimal': true}});
+};
+function Reduzir10minutos() { console.log('Reduzir 10 minutos ----> Ok'); xajax_doAllBuildingCutShort('allBuildings',{});
+};
+$j("#Pause").click(function() {
+clearInterval(e);
+GM_setValue(playerName + "ScriptStart", "false"); f = "false";
+$j("#play").css("display", "inline-block"); $j("#Pause").css("display", "none");
+e = 0;
+$j("#AtaqueAudio").trigger('pause'); $j("#AtaqueAudio").prop("currentTime", 0); $j("#SpyAudio").trigger('pause'); $j("#SpyAudio").prop("currentTime", 0); $j("#MessageAudio").trigger('pause');
+
+ $j("#MessageAudio").prop("currentTime", 0); $j("#LoginAudio").trigger('pause'); $j("#LoginAudio").prop("currentTime", 0);
+});
+if (f == "true") {
+var l = document.URL;
+if (l.toLowerCase().indexOf("homepage.php") >= 0) {
+if (k == "true") { $j("#LoginAudio").trigger("play"); $j("#play").css("display", "none"); $j("#Pause").css("display", "inline-block");
+}
+} else {
+$j("#play").click(); }
+} });
+document.body.style.background = 'green';
