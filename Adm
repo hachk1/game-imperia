@@ -1,0 +1,52 @@
+from fpdf import FPDF
+
+# Criando o guia completo do laboratório em PDF
+pdf = FPDF()
+pdf.add_page()
+pdf.set_font("Arial", "B", 16)
+pdf.cell(0, 10, "LABORATÓRIO DE SIMULAÇÃO DE BLOQUEIO UNIVERSAL PARA ANDROID", ln=True, align="C")
+
+pdf.ln(10)
+pdf.set_font("Arial", "", 12)
+pdf.multi_cell(0, 10, """
+Este laboratório destina-se a fins educativos e de cibersegurança, permitindo simular um bloqueio ético de tela em dispositivos Android.
+
+O app foi projetado em modo universal, compatível com a maioria dos aparelhos Android (de qualquer marca).
+
+IMPORTANTE: Para um bloqueio REAL e irreversível, é necessário instalar o app como 'Device Owner', conforme orientações abaixo.
+
+---
+INSTALAÇÃO NORMAL (BLOQUEIO SIMULADO):
+1. Abra o projeto no Android Studio.
+2. Compile e instale no celular via USB ou gere o APK.
+3. Ao abrir o app, a tela de bloqueio simulado aparecerá.
+4. Apenas com a senha correta (SenhaForte123@!) o app se fecha.
+5. O usuário ainda poderá sair ou remover o app manualmente (simulação ética).
+
+---
+INSTALAÇÃO COMO DEVICE OWNER (BLOQUEIO COMPLETO):
+1. Ative o modo desenvolvedor no aparelho.
+2. Conecte o dispositivo via USB.
+3. Execute o comando:
+   adb shell dpm set-device-owner com.example.simuladorbloqueio/.MainActivity
+4. Reinicie o aparelho.
+5. O app terá permissões administrativas e impedirá sua remoção sem reset de fábrica.
+6. Todas as portas físicas do aparelho ficam bloqueadas, o app impede saídas até a senha correta ser digitada.
+
+---
+RECOMENDAÇÕES DE SEGURANÇA:
+✔️ Use apenas em dispositivos próprios ou autorizados.
+✔️ Nunca utilize para bloqueios reais sem consentimento.
+✔️ O projeto contém criptografia simulada AES-256 para demonstração.
+✔️ Evite modificar o código para fins maliciosos.
+
+---
+DÚVIDAS OU AJUSTES? Solicite suporte pelo assistente.
+
+""")
+
+# Salvando o PDF
+pdf_path = "/mnt/data/Guia_Laboratorio_Bloqueio_Universal.pdf"
+pdf.output(pdf_path)
+
+pdf_path
